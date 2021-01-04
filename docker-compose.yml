@@ -7,9 +7,9 @@ services:
     container_name: nginx
     environment:
       - TZ=Asia/Shanghai
-    ports:
-      - "80:80"
-      - "443:443"
+#    ports:
+#      - "80:80"
+#      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/logs:/var/log/nginx/
@@ -17,9 +17,36 @@ services:
       - /etc/localtime:/etc/localtime
     networks:
       extnetwork:
-        ipv4_address: 172.19.0.101
+        ipv4_address: 172.19.0.5
   
-  
+  node-http-proxy:
+    image: land007/node-http-proxy:latest
+#    restart: always
+    privileged: true
+    networks:
+      - internal_network
+    expose:
+      - "80"
+      - "20022"
+    ports:
+      - "80:80"
+#      - "20022:20022"
+    environment:
+      - username=gjxt
+      - http_proxy_domains=
+      - http_proxy_paths=/
+      - http_proxy_hosts=nginx
+      - http_proxy_ports=80
+      - http_proxy_pretends=true
+      - ws_proxy_paths=/
+      - ws_proxy_hosts=nginx
+      - ws_proxy_ports=80
+    volumes:
+      -  ./node-http-proxy:/node
+    networks:
+      extnetwork:
+        ipv4_address: 172.19.0.6
+
   redis:
     image: redis:latest
     container_name: redis
@@ -73,7 +100,7 @@ services:
       - /etc/localtime:/etc/localtime
     command: [
       'java',
-      '-Xmx200m',
+      '-Xmx1024m',
       '-jar',
       '/usr/local/luckysheet-server/app.jar',
       '--spring.config.location=/usr/local/luckysheet-server/application.yml,/usr/local/luckysheet-server/application-dev.yml'
