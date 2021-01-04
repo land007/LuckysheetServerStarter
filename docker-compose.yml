@@ -22,6 +22,7 @@ services:
   node-http-proxy:
     image: land007/node-http-proxy:latest
 #    restart: always
+    container_name: node-http-proxy
     privileged: true
     networks:
       - internal_network
@@ -38,8 +39,8 @@ services:
       - http_proxy_hosts=nginx
       - http_proxy_ports=80
       - http_proxy_pretends=true
-      - ws_proxy_paths=/
-      - ws_proxy_hosts=nginx
+      - ws_proxy_paths=/luckysheet/websocket/
+      - ws_proxy_hosts=luckysheet-server
       - ws_proxy_ports=80
     volumes:
       -  ./node-http-proxy:/node
@@ -90,7 +91,7 @@ services:
     image: java:8
     #restart: always
     privileged: true
-    container_name: luckysheet-server  
+    container_name: luckysheet-server
     ports:
       - 9004:9004
     volumes:
